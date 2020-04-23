@@ -8,7 +8,8 @@ app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json());
 app.use(cors())
 
-dburl ="mongodb://localhost:27017/"
+dburl ="mongodb+srv://antonyrahul96:antonyrahul96@cluster0-aoyxh.mongodb.net/test?retryWrites=true&w=majority"
+//"mongodb://localhost:27017/"
 app.post('/generateurl', function (req, res) {
    
     console.log(req.body);
