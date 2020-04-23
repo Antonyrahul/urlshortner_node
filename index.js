@@ -73,7 +73,7 @@ app.post('/getlongurl', function (req, res) {
 })
 })
 
-app.listen(4123, function () {
+app.listen(process.env.PORT, function () {
 
     console.log("listening on port 4123");
 });
