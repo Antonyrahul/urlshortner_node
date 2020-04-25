@@ -167,10 +167,14 @@ app.get('/:id', function (req, res) {
    console.log("in")
     console.log(id);
     //console.log(req.connection)
-    res.send(req.path)
-    res.send(req.baseUrl)
-    res.send(req.ip)
-    res.send(req.headers)
+    res.json({
+        a:req.path,
+        b:req.baseUrl,
+        c: req.ip,
+        d:req.headers
+
+    })
+   
     console.log(req.path)
     console.log(req.baseUrl)
     console.log(req.ip)
