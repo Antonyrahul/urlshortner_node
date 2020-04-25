@@ -160,10 +160,12 @@ app.post('/generateurl', function (req, res) {
 
 })
 })
+app.get('/favicon.ico', (req, res) => res.status(204));
 
-app.post('/getlongurl', function (req, res) {
-   
-    console.log(req.body);
+app.get('/:id', function (req, res) {
+   var id = req.params.id;
+   console.log("in")
+    console.log(id);
    
     
     mongodbclient.connect(dburl, function (err, client) {
@@ -171,7 +173,7 @@ app.post('/getlongurl', function (req, res) {
         var db = client.db("urldb");
         userData= {
             
-            shorturl :req.body.data
+            shorturl :id
         }
         updatedata={$inc:{
             visitcount : +1
@@ -181,10 +183,15 @@ app.post('/getlongurl', function (req, res) {
             db.collection("urlcollection").findOneAndUpdate(userData,updatedata, function (err, data) {
                 if (err) throw err;
                 client.close();
+                if(data.value.longurl)
+                res.redirect(data.value.longurl)
+                else
                 res.json({
-                    message: "saved",
-                    data:data
-            })
+                    mesaage:"url not found"
+                })
+             
+            console.log(data.value.longurl)
+           
             // Store hash in your password DB.
         
 
