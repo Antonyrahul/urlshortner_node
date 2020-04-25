@@ -5,11 +5,13 @@ const cors = require('cors')
 const bodyparser = require('body-parser');
 const mongodbclient = require('mongodb');
 const bcrypt = require('bcrypt');
+const geoip = require('geoip-lite');
 const saltRounds = 10;
 const jwt =  require("jsonwebtoken");
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json());
 app.use(cors())
+
 
 dburl ="mongodb+srv://antonyrahul96:antonyrahul96@cluster0-aoyxh.mongodb.net/test?retryWrites=true&w=majority"
 //dburl = "mongodb://localhost:27017/"
@@ -166,12 +168,21 @@ app.get('/:id', function (req, res) {
    var id = req.params.id;
    console.log("in")
     console.log(id);
+    customerip = req.headers['x-forwarded-for'];
+    devicename = req.headers['user-agent']
+    i1 = devicename.indexOf("(")
+    i2 = devicename.indexOf(';')
+     dev = devicename.slice(i1+1,i2)
+     var geo = geoip.lookup("115.97.35.99");
     //console.log(req.connection)
     res.json({
         a:req.path,
         b:req.baseUrl,
         c: req.ip,
-        d:req.headers
+        d:req.headers,
+        e:customerip,
+        f:dev,
+        g:geo
 
     })
    
@@ -205,6 +216,38 @@ app.get('/:id', function (req, res) {
              
             console.log(data.value.longurl)
            
+            // Store hash in your password DB.
+        
+
+       // client.close();
+    });
+
+})
+})
+app.post('/getlongurl', function (req, res) {
+   
+    console.log(req.body);
+   
+    
+    mongodbclient.connect(dburl, function (err, client) {
+        if (err) throw err;
+        var db = client.db("urldb");
+        userData= {
+            
+            shorturl :req.body.data
+        }
+        updatedata={$inc:{
+            visitcount : +1
+        }
+        }
+      
+            db.collection("urlcollection").findOneAndUpdate(userData,updatedata, function (err, data) {
+                if (err) throw err;
+                client.close();
+                res.json({
+                    message: "saved",
+                    data:data
+            })
             // Store hash in your password DB.
         
 
