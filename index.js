@@ -166,6 +166,15 @@ app.get('/:id', function (req, res) {
    var id = req.params.id;
    console.log("in")
     console.log(id);
+    //console.log(req.connection)
+    res.send(req.path)
+    res.send(req.baseUrl)
+    res.send(req.ip)
+    res.send(req.headers)
+    console.log(req.path)
+    console.log(req.baseUrl)
+    console.log(req.ip)
+    console.log(req.headers)
    
     
     mongodbclient.connect(dburl, function (err, client) {
