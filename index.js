@@ -200,7 +200,7 @@ app.get('/:id', function (req, res) {
     customerip = req.headers['x-forwarded-for'];
     devicename = req.headers['user-agent']
     i1 = devicename.indexOf("(")
-    i2 = devicename.indexOf(';')
+    i2 = devicename.indexOf(')')
      device = devicename.slice(i1+1,i2)
      var geo = geoip.lookup(customerip);
      countryname =(getName(geo.country));
