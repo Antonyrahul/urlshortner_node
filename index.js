@@ -202,7 +202,7 @@ app.get('/:id', function (req, res) {
     i1 = devicename.indexOf("(")
     i2 = devicename.indexOf(';')
      device = devicename.slice(i1+1,i2)
-     var geo = geoip.lookup("115.97.35.99");
+     var geo = geoip.lookup(customerip);
      countryname =(getName(geo.country));
      // console.log(countryname)
     //console.log(req.connection)
@@ -272,13 +272,13 @@ app.post('/getlongurl', function (req, res) {
    
     console.log(req.body);
     console.log("in")
-    console.log(id);
+    
     customerip = req.headers['x-forwarded-for'];
     devicename = req.headers['user-agent']
     i1 = devicename.indexOf("(")
     i2 = devicename.indexOf(';')
      device = devicename.slice(i1+1,i2)
-     var geo = geoip.lookup("115.97.35.99");
+     var geo = geoip.lookup(customerip);
      countryname =(getName(geo.country));
      // console.log(countryname)
     //console.log(req.connection)
@@ -308,10 +308,7 @@ dateandtime = date+'-'+month+'-'+year+"  "+hours+":"+minutes+":"+seconds
     mongodbclient.connect(dburl, function (err, client) {
         if (err) throw err;
         var db = client.db("urldb");
-        userData= {
-            
-            shorturl :req.body.data
-        }
+       
         historydata ={
             dateandtime:dateandtime,
             location:countryname,
@@ -325,7 +322,7 @@ dateandtime = date+'-'+month+'-'+year+"  "+hours+":"+minutes+":"+seconds
         $push:{history:historydata}
         }
       
-            db.collection("urlcollection").findOneAndUpdate(userData,updatedata, function (err, data) {
+            db.collection("urlcollection").findOneAndUpdate(req.body,updatedata, function (err, data) {
                 if (err) throw err;
                 client.close();
                 res.json({
