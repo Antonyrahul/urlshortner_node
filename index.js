@@ -3,6 +3,8 @@ const express = require('express');
 const app = express();
 const cors = require('cors')
 const bodyparser = require('body-parser');
+const { getName } = require('country-list');
+
 const mongodbclient = require('mongodb');
 const bcrypt = require('bcrypt');
 const geoip = require('geoip-lite');
@@ -128,6 +130,33 @@ app.post('/getUrls', function (req, res) {
 })
 
 
+app.post('/gethistory', function (req, res) {
+    console.log(req.body);
+    mongodbclient.connect(dburl, function (err, client) {
+        useUnifiedTopology: true
+        if (err) throw err;
+        var db = client.db("urldb");
+     
+           
+                db.collection("urlcollection").find(req.body).toArray(function (err, data) {
+                    if (err) throw err;
+                    client.close();
+                    res.json({
+                        message: "saved",
+                        data:data
+                    })
+                })
+            
+          
+            // Store hash in your password DB.
+        
+
+       // client.close();
+    });
+
+})
+
+
 app.post('/generateurl', function (req, res) {
    
     console.log(req.body);
@@ -172,26 +201,33 @@ app.get('/:id', function (req, res) {
     devicename = req.headers['user-agent']
     i1 = devicename.indexOf("(")
     i2 = devicename.indexOf(';')
-     dev = devicename.slice(i1+1,i2)
+     device = devicename.slice(i1+1,i2)
      var geo = geoip.lookup("115.97.35.99");
+     countryname =(getName(geo.country));
+     // console.log(countryname)
     //console.log(req.connection)
-    res.json({
-        a:req.path,
-        b:req.baseUrl,
-        c: req.ip,
-        d:req.headers,
-        e:customerip,
-        f:dev,
-        g:geo
+    let date_ob = new Date();
 
-    })
-   
-    console.log(req.path)
-    console.log(req.baseUrl)
-    console.log(req.ip)
-    console.log(req.headers)
-   
-    
+// current date
+// adjust 0 before single digit date
+let date = ("0" + date_ob.getDate()).slice(-2);
+
+// current month
+let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+
+// current year
+let year = date_ob.getFullYear();
+
+// current hours
+let hours = date_ob.getHours();
+
+// current minutes
+let minutes = date_ob.getMinutes();
+
+// current seconds
+let seconds = date_ob.getSeconds();
+dateandtime = date+'-'+month+'-'+year+"  "+hours+":"+minutes+":"+seconds
+
     mongodbclient.connect(dburl, function (err, client) {
         if (err) throw err;
         var db = client.db("urldb");
@@ -199,16 +235,24 @@ app.get('/:id', function (req, res) {
             
             shorturl :id
         }
-        updatedata={$inc:{
-            visitcount : +1
+        historydata ={
+            dateandtime:dateandtime,
+            location:countryname,
+            devicedetails : device,
+            customerip:customerip
+
         }
+        updatedata={$inc:{
+            externalvisitcount : +1
+        },
+        $push:{history:historydata}
         }
       
             db.collection("urlcollection").findOneAndUpdate(userData,updatedata, function (err, data) {
                 if (err) throw err;
                 client.close();
                 if(data.value.longurl)
-              //  res.redirect(data.value.longurl)
+                res.redirect(data.value.longurl)
 //else
               //  res.json({
              //       mesaage:"url not found"
@@ -227,6 +271,38 @@ app.get('/:id', function (req, res) {
 app.post('/getlongurl', function (req, res) {
    
     console.log(req.body);
+    console.log("in")
+    console.log(id);
+    customerip = req.headers['x-forwarded-for'];
+    devicename = req.headers['user-agent']
+    i1 = devicename.indexOf("(")
+    i2 = devicename.indexOf(';')
+     device = devicename.slice(i1+1,i2)
+     var geo = geoip.lookup("115.97.35.99");
+     countryname =(getName(geo.country));
+     // console.log(countryname)
+    //console.log(req.connection)
+    let date_ob = new Date();
+
+// current date
+// adjust 0 before single digit date
+let date = ("0" + date_ob.getDate()).slice(-2);
+
+// current month
+let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+
+// current year
+let year = date_ob.getFullYear();
+
+// current hours
+let hours = date_ob.getHours();
+
+// current minutes
+let minutes = date_ob.getMinutes();
+
+// current seconds
+let seconds = date_ob.getSeconds();
+dateandtime = date+'-'+month+'-'+year+"  "+hours+":"+minutes+":"+seconds
    
     
     mongodbclient.connect(dburl, function (err, client) {
@@ -236,9 +312,17 @@ app.post('/getlongurl', function (req, res) {
             
             shorturl :req.body.data
         }
-        updatedata={$inc:{
-            visitcount : +1
+        historydata ={
+            dateandtime:dateandtime,
+            location:countryname,
+            devicedetails : device,
+            customerip:customerip
+
         }
+        updatedata={$inc:{
+            homevisitcount : +1
+        },
+        $push:{history:historydata}
         }
       
             db.collection("urlcollection").findOneAndUpdate(userData,updatedata, function (err, data) {
