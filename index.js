@@ -193,11 +193,11 @@ app.get('/:id', function (req, res) {
                 if (err) throw err;
                 client.close();
                 if(data.value.longurl)
-                res.redirect(data.value.longurl)
-                else
-                res.json({
-                    mesaage:"url not found"
-                })
+              //  res.redirect(data.value.longurl)
+//else
+              //  res.json({
+             //       mesaage:"url not found"
+            //    })
              
             console.log(data.value.longurl)
            
