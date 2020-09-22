@@ -10,6 +10,8 @@ const bcrypt = require('bcrypt');
 const geoip = require('geoip-lite');
 const saltRounds = 10;
 const jwt =  require("jsonwebtoken");
+const { time } = require('console');
+const { title } = require('process');
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(bodyparser.json());
 app.use(cors())
@@ -175,6 +177,7 @@ app.post('/generateurl', function (req, res) {
             shorturl :url,
             email: req.body.email
         }
+
       
             db.collection("urlcollection").insertOne(userData, function (err, data) {
                 if (err) throw err;
@@ -191,6 +194,112 @@ app.post('/generateurl', function (req, res) {
 
 })
 })
+
+app.post('/storeurl', function (req, res) {
+   
+    console.log(req.body);
+   
+    
+    mongodbclient.connect(dburl, function (err, client) {
+        if (err) throw err;
+        var db = client.db("urldb");
+
+        updatedata1={
+            $push:{biiiurls:{
+                title:req.body.title,
+                url:req.body.url,
+                state:req.body.state
+            }
+        }
+        }
+      
+            db.collection("usersCollection").findOneAndUpdate({email:req.body.email},updatedata1, function (err, data) {
+                if (err) throw err;
+                client.close();
+                res.json({
+                    message: "saved",
+                    data:data
+            })
+            // Store hash in your password DB.
+        
+
+       // client.close();
+    });
+
+})
+})
+
+app.post('/geturlsbiii', function (req, res) {
+   
+    console.log(req.body);
+   
+    
+    mongodbclient.connect(dburl, function (err, client) {
+        if (err) throw err;
+        var db = client.db("urldb");
+        console.log('in')
+      
+            db.collection("usersCollection").findOne(req.body, function (err, data) {
+                if (err) throw err;
+                client.close();
+                console.log(data)
+                res.json({
+                    message: "saved",
+                    data:data
+            })
+            // Store hash in your password DB.
+        
+
+       // client.close();
+    });
+
+})
+})
+
+
+app.post('/changelinkstate', function (req, res) {
+   
+    console.log(req.body);
+    console.log(req.body.state)
+   finddata={
+    $and: [
+      {
+        email: req.body.email
+      },
+      {
+        biiiurls:{$elemMatch:{title:req.body.title}}
+      }
+    ]
+  }
+  updatedata={$set:{
+    "biiiurls.$.state":!req.body.state
+    }
+  
+     
+  }
+    
+    mongodbclient.connect(dburl, function (err, client) {
+        if (err) throw err;
+        var db = client.db("urldb");
+        console.log('in')
+      
+            db.collection("usersCollection").findOneAndUpdate(finddata,updatedata, function (err, data) {
+                if (err) throw err;
+                client.close();
+                console.log(data.value)
+                res.json({
+                    message: "saved",
+                    data:data
+            })
+            // Store hash in your password DB.
+        
+
+       // client.close();
+    });
+
+})
+})
+
 app.get('/favicon.ico', (req, res) => res.status(204));
 
 app.get('/:id', function (req, res) {
