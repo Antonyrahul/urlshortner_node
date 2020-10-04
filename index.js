@@ -7,7 +7,10 @@ const { getName } = require('country-list');
 const http = require('http').createServer(app);
 
 
-const io = require('socket.io')(app);
+const server = app.listen(process.env.PORT, () => {
+    console.log("Listening on port: ");
+});
+const io = require('socket.io')(server);
 
 const mongodbclient = require('mongodb');
 const bcrypt = require('bcrypt');
@@ -299,7 +302,7 @@ app.post('/changelinkstate', function (req, res) {
                     data:data
                     
             })
-           // io.emit(req.body.name,"refresh")
+           io.emit(req.body.name,"refresh")
             // Store hash in your password DB.
         
 
@@ -456,13 +459,13 @@ dateandtime = date+'-'+month+'-'+year+"  "+hours+":"+minutes+":"+seconds
 })
 })
 //process.env.PORT
-// io.on('connection', (socket) => {
-//     console.log('a user connected');
-//     io.emit("hello pepes","poda")
-//     socket.on('disconnect', () => {
-//       console.log('user disconnected');
-//     });
-//   });
+io.on('connection', (socket) => {
+    console.log('a user connected');
+    io.emit("hello pepes","poda")
+    socket.on('disconnect', () => {
+      console.log('user disconnected');
+    });
+  });
   app.listen(process.env.PORT, function () {
 
     console.log("listening on port 4123");
