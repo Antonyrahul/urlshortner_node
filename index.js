@@ -5,9 +5,12 @@ const cors = require('cors')
 const bodyparser = require('body-parser');
 const { getName } = require('country-list');
 const http = require('http').createServer(app);
-const server = express()
-    .listen(process.env.PORT, () => console.log(`Listening on ${PORT}`));
-const io = require('socket.io')(server);
+app.listen(process.env.PORT, function () {
+
+    console.log("listening on port 4123");
+});
+
+const io = require('socket.io')(app);
 
 const mongodbclient = require('mongodb');
 const bcrypt = require('bcrypt');
@@ -464,10 +467,7 @@ io.on('connection', (socket) => {
     });
   });
   
-app.listen(process.env.PORT, function () {
 
-    console.log("listening on port 4123");
-});
 // http.listen(process.env.PORT,() => {
 //     console.log('listening on *:3000');
 //   });
