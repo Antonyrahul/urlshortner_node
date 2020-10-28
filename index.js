@@ -8,9 +8,9 @@ const http = require('http').createServer(app);
 const stripe = require('stripe')("sk_test_51He0yQHWswhGwF5x9Iwye4Lq4zn1XvgX9xigetHfnyghoJKqzevamteFBLVwTyyPJgaYw1dXWlF1YBM8dtXklO2v00wwJf5laq")
 const YOUR_DOMAIN = 'http://localhost:4200';
 const Razorpay = require('razorpay')
-const server = app.listen(process.env.PORT, () => {
-    console.log("Listening on port: ");
-});
+// const server = app.listen(process.env.PORT, () => {
+//     console.log("Listening on port: ");
+// });
 //const io = require('socket.io')(server);
 
 const mongodbclient = require('mongodb');
