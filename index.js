@@ -30,6 +30,9 @@ dburl = "mongodb://localhost:27017/"
 // app.get("/",function (req,res){
 //     res.send("helllllooooo")
 // })
+app.get('/',function(req,res){
+    res.send("hello")
+})
 app.post('/loginuser', function (req, res) {
     console.log(req.body);
     mongodbclient.connect(dburl, function (err, client) {
@@ -536,7 +539,7 @@ dateandtime = date+'-'+month+'-'+year+"  "+hours+":"+minutes+":"+seconds
 //       console.log('user disconnected');
 //     });
 //   });
-  app.listen(process.env.PORT, function () {
+  app.listen(4123, function () {
 
     console.log("listening on port 4123");
 });
