@@ -14,7 +14,7 @@ const server = app.listen(process.env.PORT, () => {
 //const io = require('socket.io')(server);
 
 const mongodbclient = require('mongodb');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const geoip = require('geoip-lite');
 const saltRounds = 10;
 const jwt =  require("jsonwebtoken");
