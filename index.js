@@ -5,12 +5,13 @@ const cors = require('cors')
 const bodyparser = require('body-parser');
 const { getName } = require('country-list');
 const http = require('http').createServer(app);
-
-
+const stripe = require('stripe')("sk_test_51He0yQHWswhGwF5x9Iwye4Lq4zn1XvgX9xigetHfnyghoJKqzevamteFBLVwTyyPJgaYw1dXWlF1YBM8dtXklO2v00wwJf5laq")
+const YOUR_DOMAIN = 'http://localhost:4200';
+const Razorpay = require('razorpay')
 const server = app.listen(process.env.PORT, () => {
     console.log("Listening on port: ");
 });
-const io = require('socket.io')(server);
+//const io = require('socket.io')(server);
 
 const mongodbclient = require('mongodb');
 const bcrypt = require('bcrypt');
@@ -24,8 +25,8 @@ app.use(bodyparser.json());
 app.use(cors())
 
 
-dburl ="mongodb+srv://antonyrahul96:antonyrahul96@cluster0-aoyxh.mongodb.net/test?retryWrites=true&w=majority"
-//dburl = "mongodb://localhost:27017/"
+//dburl ="mongodb+srv://antonyrahul96:antonyrahul96@cluster0-aoyxh.mongodb.net/test?retryWrites=true&w=majority"
+dburl = "mongodb://localhost:27017/"
 // app.get("/",function (req,res){
 //     res.send("helllllooooo")
 // })
@@ -302,7 +303,7 @@ app.post('/changelinkstate', function (req, res) {
                     data:data
                     
             })
-           io.emit(req.body.name,"refresh")
+          // io.emit(req.body.name,"refresh")
             // Store hash in your password DB.
         
 
@@ -389,6 +390,75 @@ dateandtime = date+'-'+month+'-'+year+"  "+hours+":"+minutes+":"+seconds
 
 })
 })
+app.post('/payment',function(req,res){
+    console.log(req.body)
+    var instance = new Razorpay({ key_id: 'rzp_test_Xg0FLdhPVPs7oM', key_secret: '6oPPaE667NwhvRntBts4rSyu' })
+
+var options = {
+  amount: 50000,  // amount in the smallest currency unit
+  currency: "INR",
+  receipt: "order_rcptid_12"
+};
+ instance.orders.create(options,async function(err, order) {
+  console.log(order);
+  if(err)
+  throw err;
+   res.json({
+      message:"success",
+      data:order
+  })
+
+
+})
+})
+
+app.post('/secure',function(req,res){
+    console.log("body",req.body)
+    var generatedSignature = crypto
+    .createHmac(
+      "SHA256",
+      "6oPPaE667NwhvRntBts4rSyu"
+    )
+    .update(req.body.razorpay_order_id + "|" + req.body.razorpay_payment_id)
+    .digest("hex");  
+    console.log("gensig",generatedSignature)
+    console.log("razsig",req.body.razorpay_signature)
+    if(generatedSignature==req.body.razorpay_signature)
+    {
+        console.log("secured")
+        res.json({
+            message:"secure"
+        })
+    }
+  });
+
+
+  app.post('/create-session', async (req, res) => {
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'inr',
+            product_data: {
+              name: 'Stubborn Attachments',
+              images: ['https://i.imgur.com/EHyR2nP.png'],
+            },
+            unit_amount: 2000,
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: `${YOUR_DOMAIN}/success.html`,
+      cancel_url: `${YOUR_DOMAIN}/cancel.html`,
+    });
+    res.json({ id: session.id });
+  });
+
+
+
+
 app.post('/getlongurl', function (req, res) {
    
     console.log(req.body);
@@ -459,14 +529,14 @@ dateandtime = date+'-'+month+'-'+year+"  "+hours+":"+minutes+":"+seconds
 })
 })
 //process.env.PORT
-io.on('connection', (socket) => {
-    console.log('a user connected');
-    io.emit("hello pepes","poda")
-    socket.on('disconnect', () => {
-      console.log('user disconnected');
-    });
-  });
-  app.listen(process.env.PORT, function () {
+// io.on('connection', (socket) => {
+//     console.log('a user connected');
+//     io.emit("hello pepes","poda")
+//     socket.on('disconnect', () => {
+//       console.log('user disconnected');
+//     });
+//   });
+  app.listen(4123, function () {
 
     console.log("listening on port 4123");
 });
