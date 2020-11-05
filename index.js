@@ -25,8 +25,8 @@ app.use(bodyparser.json());
 app.use(cors())
 
 
-//dburl ="mongodb+srv://antonyrahul96:antonyrahul96@cluster0-aoyxh.mongodb.net/test?retryWrites=true&w=majority"
-dburl = "mongodb://localhost:27017/"
+dburl ="mongodb+srv://antonyrahul96:antonyrahul96@cluster0-aoyxh.mongodb.net/test?retryWrites=true&w=majority"
+//dburl = "mongodb://localhost:27017/"
 // app.get("/",function (req,res){
 //     res.send("helllllooooo")
 // })
@@ -539,7 +539,7 @@ dateandtime = date+'-'+month+'-'+year+"  "+hours+":"+minutes+":"+seconds
 //       console.log('user disconnected');
 //     });
 //   });
-  app.listen(4123, function () {
+  app.listen(process.env.PORT, function () {
 
     console.log("listening on port 4123");
 });
