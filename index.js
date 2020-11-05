@@ -460,7 +460,11 @@ app.post('/secure',function(req,res){
   });
 
 
-
+app.post('/paymentsucess',function(req,res){
+    console.log(req.body)
+    
+    res.send("<script>window.close();</script > ")
+})
 
 app.post('/getlongurl', function (req, res) {
    
