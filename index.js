@@ -318,81 +318,81 @@ app.post('/changelinkstate', function (req, res) {
 
 app.get('/favicon.ico', (req, res) => res.status(204));
 
-app.get('/:id', function (req, res) {
-   var id = req.params.id;
-   console.log("in")
-    console.log(id);
-    customerip = req.headers['x-forwarded-for'];
-    devicename = req.headers['user-agent']
-    i1 = devicename.indexOf("(")
-    i2 = devicename.indexOf(')')
-     device = devicename.slice(i1+1,i2)
-     var geo = geoip.lookup(customerip);
-     countryname =(getName(geo.country));
-     // console.log(countryname)
-    //console.log(req.connection)
-    let date_ob = new Date();
+// app.get('/:id', function (req, res) {
+//    var id = req.params.id;
+//    console.log("in")
+//     console.log(id);
+//     customerip = req.headers['x-forwarded-for'];
+//     devicename = req.headers['user-agent']
+//     i1 = devicename.indexOf("(")
+//     i2 = devicename.indexOf(')')
+//      device = devicename.slice(i1+1,i2)
+//      var geo = geoip.lookup(customerip);
+//      countryname =(getName(geo.country));
+//      // console.log(countryname)
+//     //console.log(req.connection)
+//     let date_ob = new Date();
 
-// current date
-// adjust 0 before single digit date
-let date = ("0" + date_ob.getDate()).slice(-2);
+// // current date
+// // adjust 0 before single digit date
+// let date = ("0" + date_ob.getDate()).slice(-2);
 
-// current month
-let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+// // current month
+// let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
 
-// current year
-let year = date_ob.getFullYear();
+// // current year
+// let year = date_ob.getFullYear();
 
-// current hours
-let hours = date_ob.getHours();
+// // current hours
+// let hours = date_ob.getHours();
 
-// current minutes
-let minutes = date_ob.getMinutes();
+// // current minutes
+// let minutes = date_ob.getMinutes();
 
-// current seconds
-let seconds = date_ob.getSeconds();
-dateandtime = date+'-'+month+'-'+year+"  "+hours+":"+minutes+":"+seconds
+// // current seconds
+// let seconds = date_ob.getSeconds();
+// dateandtime = date+'-'+month+'-'+year+"  "+hours+":"+minutes+":"+seconds
 
-    mongodbclient.connect(dburl, function (err, client) {
-        if (err) throw err;
-        var db = client.db("urldb");
-        userData= {
+//     mongodbclient.connect(dburl, function (err, client) {
+//         if (err) throw err;
+//         var db = client.db("urldb");
+//         userData= {
             
-            shorturl :id
-        }
-        historydata ={
-            dateandtime:dateandtime,
-            location:countryname,
-            devicedetails : device,
-            customerip:customerip
+//             shorturl :id
+//         }
+//         historydata ={
+//             dateandtime:dateandtime,
+//             location:countryname,
+//             devicedetails : device,
+//             customerip:customerip
 
-        }
-        updatedata={$inc:{
-            externalvisitcount : +1
-        },
-        $push:{history:historydata}
-        }
+//         }
+//         updatedata={$inc:{
+//             externalvisitcount : +1
+//         },
+//         $push:{history:historydata}
+//         }
       
-            db.collection("urlcollection").findOneAndUpdate(userData,updatedata, function (err, data) {
-                if (err) throw err;
-                client.close();
-                if(data.value.longurl)
-                res.redirect(data.value.longurl)
-//else
-              //  res.json({
-             //       mesaage:"url not found"
-            //    })
+//             db.collection("urlcollection").findOneAndUpdate(userData,updatedata, function (err, data) {
+//                 if (err) throw err;
+//                 client.close();
+//                 if(data.value.longurl)
+//                 res.redirect(data.value.longurl)
+// //else
+//               //  res.json({
+//              //       mesaage:"url not found"
+//             //    })
              
-            console.log(data.value.longurl)
+//             console.log(data.value.longurl)
            
-            // Store hash in your password DB.
+//             // Store hash in your password DB.
         
 
-       // client.close();
-    });
+//        // client.close();
+//     });
 
-})
-})
+// })
+// })
 app.post('/payment',function(req,res){
     console.log(req.body)
     var instance = new Razorpay({ key_id: 'rzp_test_Xg0FLdhPVPs7oM', key_secret: '6oPPaE667NwhvRntBts4rSyu' })
@@ -459,12 +459,69 @@ app.post('/secure',function(req,res){
     res.json({ id: session.id });
   });
 
+  app.post('/create-payment-intent', async (req, res) => {
+    
+    console.log(req.body)
+    // Create a PaymentIntent with the order amount and currency
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: req.body.total,
+      currency: "inr"
+    });
+    res.send({
+      clientSecret: paymentIntent.client_secret
+    });
+  });
+
 
 app.post('/paymentsucess',function(req,res){
     console.log(req.body)
     
-    res.send("<script>window.close();</script > ")
+    //res.send("<script>window.close();</script > ")
+    res.send(200)
 })
+
+app.post('/cashfreepay',function(req, res, next){
+
+	var postData = {
+		"appId" : "413544d9aa4324fb6b3bcb87645314",
+		"orderId" : "req.body.orderId",
+		"orderAmount" : "600",
+		"orderCurrency" : "inr",
+		"orderNote" : "req.body.orderNote",
+		'customerName' : "req.body.customerName",
+		"customerEmail" : "poda@gmail.com",
+		"customerPhone" : "9999999999",
+		"returnUrl" : "patmentsuccess",
+        "notifyUrl" : "req.body.notifyUrl",
+        "card_number":"4111111111111111",
+        "card_holder":"poda",
+        "card_expiryMonth":"09",
+        "card_expiryYear":"2087",
+        "card_cvv":"123"
+
+
+
+	},
+	mode = "TEST",
+	secretKey = "5abcfeabe78de9110250e1e3db43ee6c1943a0cd",
+	sortedkeys = Object.keys(postData),
+	url="",
+	signatureData = "";
+	sortedkeys.sort();
+	for (var i = 0; i < sortedkeys.length; i++) {
+		k = sortedkeys[i];
+		signatureData += k + postData[k];
+	}
+	var signature = crypto.createHmac('sha256',secretKey).update(signatureData).digest('base64');
+	postData['signature'] = signature;
+	if (mode == "PROD") {
+	  url = "https://www.cashfree.com/checkout/post/submit";
+	} else {
+	  url = "https://test.cashfree.com/billpay/checkout/post/submit";
+	}
+	res.send({postData : JSON.stringify(postData),url : url});
+});
+
 
 app.post('/getlongurl', function (req, res) {
    
