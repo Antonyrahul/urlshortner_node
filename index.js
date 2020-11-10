@@ -481,7 +481,7 @@ app.post('/paymentsucess',function(req,res){
 })
 
 app.post('/cashfreepay',function(req, res, next){
-
+    console.log(req.body);
 	var postData = {
 		"appId" : "413544d9aa4324fb6b3bcb87645314",
 		"orderId" : "req.body.orderId",
@@ -501,12 +501,14 @@ app.post('/cashfreepay',function(req, res, next){
 
 
 
-	},
+    },
+   
 	mode = "TEST",
 	secretKey = "5abcfeabe78de9110250e1e3db43ee6c1943a0cd",
 	sortedkeys = Object.keys(postData),
 	url="",
-	signatureData = "";
+    signatureData = "";
+    console.log(postData)
 	sortedkeys.sort();
 	for (var i = 0; i < sortedkeys.length; i++) {
 		k = sortedkeys[i];
